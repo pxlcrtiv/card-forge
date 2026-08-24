@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pytest
+          pip install -e .
+      - name: Unit tests (offline, deterministic)
+        run: python -m pytest tests/ -q
+      - name: Smoke — bundled fixtures + golden outputs
+        run: |
+          card-forge demo | grep -q "Checklist score:** A"
+          card-forge generate card_forge/data/fixtures/whisper-tiny-config.json | grep -q "automatic-speech-recognition"
+          card-forge diff card_forge/data/fixtures/gpt2-tiny-config.json card_forge/data/fixtures/whisper-tiny-config.json | grep -q "13 differences"
+          card-forge tasks | grep -q "text-generation"
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: ruff lint
+        run: |
+          pip install ruff
+          ruff check card_forge tests scripts --output-format=github
