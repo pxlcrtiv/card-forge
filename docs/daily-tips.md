@@ -1,0 +1,13 @@
+# card-forge tips of the day
+
+> Maintained by `scripts/daily_update.py` (Daily Green automation) — one
+> dated, non-empty model-card/MLOps tip per day, rotated from the pool
+> in `scripts/tips_pool.json`. Pause by creating a `.daily-pause` file
+> in the repo root, or unload the scheduler job (see README,
+> Daily Green).
+
+
+## 2026-08-24 — Model-card tip of the day: The card is part of the release
+
+Ship config, weights, and card as one artifact. A model without its card in the release notes is half-released; rollback decisions need the card to know what changed.
+

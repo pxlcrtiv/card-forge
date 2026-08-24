@@ -1,0 +1,5 @@
+# Runtime dependencies: NONE — card generation and diffing are pure stdlib
+# and run fully offline against local configs / bundled fixtures.
+# Optional:
+#   pip install "card-forge[live]"   -> generate from live Hub repo ids
+# Dev tools: pytest (tests), ruff (lint).

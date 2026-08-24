@@ -1,0 +1,10 @@
+{
+  "_model_name": "demo-gpt2-tiny",
+  "architectures": ["GPT2LMHeadModel"],
+  "model_type": "gpt2",
+  "n_embd": 128,
+  "n_layer": 2,
+  "n_head": 4,
+  "vocab_size": 50257,
+  "n_positions": 1024
+}

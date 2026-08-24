@@ -1,0 +1,7 @@
+{
+  "_model_name": "demo-bert-tiny",
+  "name": "demo-bert-tiny",
+  "license": "MIT",
+  "language": "en",
+  "tags": ["demo", "text-classification", "bert"]
+}

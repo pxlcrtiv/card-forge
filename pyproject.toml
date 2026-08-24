@@ -1,0 +1,36 @@
+[project]
+name = "card-forge"
+version = "0.1.0"
+description = "Forge complete Hugging Face model cards from config facts — license, task, architecture, params, tags, checklist score — plus config diffing between revisions. Deterministic, stdlib-only, offline fixtures or live Hub."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "pxlcrtiv" }]
+keywords = ["huggingface", "model-card", "mlops", "documentation", "models", "metadata", "devtools"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Software Development :: Documentation",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.scripts]
+card-forge = "card_forge.cli:main"
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff"]
+live = ["huggingface-hub"]  # optional: generate cards from live Hub repos
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["card_forge*"]
+
+[tool.setuptools.package-data]
+"card_forge.data" = ["fixtures/*.json", "fixtures/*.md"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
