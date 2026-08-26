@@ -18,3 +18,8 @@ Ship config, weights, and card as one artifact. A model without its card in the 
 
 > `card-forge generate ./config.json --language en`
 
+
+## 2026-08-26 — Model-card tip of the day: Tags are the discovery layer
+
+The Hub search is tag-driven. Two or three honest tags (task, domain, format) beat a dozen marketing ones; tags you cannot defend in a review get removed anyway.
+
