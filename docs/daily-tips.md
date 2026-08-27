@@ -23,3 +23,8 @@ Ship config, weights, and card as one artifact. A model without its card in the 
 
 The Hub search is tag-driven. Two or three honest tags (task, domain, format) beat a dozen marketing ones; tags you cannot defend in a review get removed anyway.
 
+
+## 2026-08-27 — Model-card tip of the day: Estimates deserve the word 'estimated'
+
+A param count computed from config geometry is an approximation (tied embeddings, head sizes, MoE experts change it). Label it or someone will quote it as exact.
+
