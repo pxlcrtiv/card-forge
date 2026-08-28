@@ -28,3 +28,8 @@ The Hub search is tag-driven. Two or three honest tags (task, domain, format) be
 
 A param count computed from config geometry is an approximation (tied embeddings, head sizes, MoE experts change it). Label it or someone will quote it as exact.
 
+
+## 2026-08-28 — Model-card tip of the day: For the unknown: say nothing, not anything
+
+Training data, bias evals, and fine-tune datasets are often unknown. The card should mark them unknown — a confident-looking empty section reads as a decision, not an omission.
+
