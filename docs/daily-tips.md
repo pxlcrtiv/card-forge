@@ -33,3 +33,10 @@ A param count computed from config geometry is an approximation (tied embeddings
 
 Training data, bias evals, and fine-tune datasets are often unknown. The card should mark them unknown — a confident-looking empty section reads as a decision, not an omission.
 
+
+## 2026-08-29 — Model-card tip of the day: Diff before you double-check
+
+Two configs that look identical in a PR can differ in one dim. Diff output gives reviewers a precise changed-keys list instead of eyeballing thousands of JSON lines.
+
+> `card-forge diff a/config.json b/config.json --format json`
+
