@@ -40,3 +40,8 @@ Two configs that look identical in a PR can differ in one dim. Diff output gives
 
 > `card-forge diff a/config.json b/config.json --format json`
 
+
+## 2026-08-30 — Model-card tip of the day: Model cards rot like code
+
+Treat the card as living documentation: update it when the config changes, link the card commit to the weights commit, and review it in the same PR.
+
