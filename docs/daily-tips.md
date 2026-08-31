@@ -45,3 +45,8 @@ Two configs that look identical in a PR can differ in one dim. Diff output gives
 
 Treat the card as living documentation: update it when the config changes, link the card commit to the weights commit, and review it in the same PR.
 
+
+## 2026-08-31 — Model-card tip of the day: Usage snippets are trust builders
+
+A copy-pasteable pipeline snippet converts a spec into a tool. People evaluate snippets first; a snippet that runs on the first try is the strongest quality signal.
+
