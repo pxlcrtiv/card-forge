@@ -50,3 +50,8 @@ Treat the card as living documentation: update it when the config changes, link 
 
 A copy-pasteable pipeline snippet converts a spec into a tool. People evaluate snippets first; a snippet that runs on the first try is the strongest quality signal.
 
+
+## 2026-09-01 — Model-card tip of the day: One card, one contract
+
+Don't merge two tasks into one card ('text-classification + QA') — the license, metrics, and limits differ. Split cards per task even if the weights are shared.
+
