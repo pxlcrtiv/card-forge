@@ -55,3 +55,8 @@ A copy-pasteable pipeline snippet converts a spec into a tool. People evaluate s
 
 Don't merge two tasks into one card ('text-classification + QA') — the license, metrics, and limits differ. Split cards per task even if the weights are shared.
 
+
+## 2026-09-02 — Model-card tip of the day: Documentation debt is model debt
+
+Every undocumented model you publish is a support ticket you will answer later, forever. Card generation at release time is cheaper than triage at adoption time.
+
