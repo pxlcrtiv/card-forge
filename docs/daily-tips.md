@@ -60,3 +60,10 @@ Don't merge two tasks into one card ('text-classification + QA') — the license
 
 Every undocumented model you publish is a support ticket you will answer later, forever. Card generation at release time is cheaper than triage at adoption time.
 
+
+## 2026-09-03 — Model-card tip of the day: Deterministic generation, human judgment
+
+An auto-generated card is a first draft that never lies. Keep the generation deterministic, then let a human edit the parts only humans know: data provenance and failure modes.
+
+> `card-forge demo`
+
