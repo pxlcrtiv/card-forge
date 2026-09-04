@@ -72,3 +72,8 @@ An auto-generated card is a first draft that never lies. Keep the generation det
 
 If a metric cannot be reproduced from the card (model id, config, eval script), it is marketing. Make 'reproduce this card's numbers' a CI job, not a promise.
 
+
+## 2026-09-05 — Model-card tip of the day: Aliases die; ids do not
+
+Linking cards by repo name breaks on renames. Store model ids, config hashes, and revision pins in the card so the artifact stays traceable after the rename.
+
