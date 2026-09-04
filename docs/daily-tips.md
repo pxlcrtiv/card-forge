@@ -67,3 +67,8 @@ An auto-generated card is a first draft that never lies. Keep the generation det
 
 > `card-forge demo`
 
+
+## 2026-09-04 — Model-card tip of the day: Reproduce, then report
+
+If a metric cannot be reproduced from the card (model id, config, eval script), it is marketing. Make 'reproduce this card's numbers' a CI job, not a promise.
+
