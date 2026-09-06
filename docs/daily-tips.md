@@ -77,3 +77,10 @@ If a metric cannot be reproduced from the card (model id, config, eval script), 
 
 Linking cards by repo name breaks on renames. Store model ids, config hashes, and revision pins in the card so the artifact stays traceable after the rename.
 
+
+## 2026-09-06 — Model-card tip of the day: A model card is a contract
+
+The card tells a downstream user what they may assume: license, task, data, limits. Card-less models get misused in production, then the misuse is blamed on the model.
+
+> `card-forge generate ./config.json`
+
