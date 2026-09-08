@@ -91,3 +91,8 @@ An undeclared license is a legal wall: nobody can ship your model anywhere. Dete
 
 > `card-forge generate ./config.json --license MIT`
 
+
+## 2026-09-08 — Model-card tip of the day: Parameters are context, not bragging
+
+A parameter count without a task says nothing. Report params next to task and metrics so readers can judge fit — a 16M classifier and a 1B chat model are different products.
+
