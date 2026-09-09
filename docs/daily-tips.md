@@ -96,3 +96,10 @@ An undeclared license is a legal wall: nobody can ship your model anywhere. Dete
 
 A parameter count without a task says nothing. Report params next to task and metrics so readers can judge fit — a 16M classifier and a 1B chat model are different products.
 
+
+## 2026-09-09 — Model-card tip of the day: Infer tasks, then verify
+
+An architecture implies a task family, not the deployment task. A BertForSequenceClassification could be spam, sentiment, or toxicity — generate the skeleton, then state the real task in prose.
+
+> `card-forge tasks`
+
