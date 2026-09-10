@@ -103,3 +103,8 @@ An architecture implies a task family, not the deployment task. A BertForSequenc
 
 > `card-forge tasks`
 
+
+## 2026-09-10 — Model-card tip of the day: Metrics belong to the target domain
+
+SQuAD F1 does not transfer to legal QA. Pick the metric for the actual deployment distribution, and say which dataset it was measured on.
+
