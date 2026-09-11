@@ -108,3 +108,8 @@ An architecture implies a task family, not the deployment task. A BertForSequenc
 
 SQuAD F1 does not transfer to legal QA. Pick the metric for the actual deployment distribution, and say which dataset it was measured on.
 
+
+## 2026-09-11 — Model-card tip of the day: Limitations are features
+
+A card that states 'expects aligned audio; WER collapses on music' saves integrations. Generic limitation boilerplate is ignored; specific ones get quoted in design docs.
+
