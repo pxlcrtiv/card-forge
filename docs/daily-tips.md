@@ -113,3 +113,8 @@ SQuAD F1 does not transfer to legal QA. Pick the metric for the actual deploymen
 
 A card that states 'expects aligned audio; WER collapses on music' saves integrations. Generic limitation boilerplate is ignored; specific ones get quoted in design docs.
 
+
+## 2026-09-12 — Model-card tip of the day: Benchmark numbers age
+
+A card with numbers from last year is a historical artifact. Date every metric and re-run before major releases; an honest 'not re-evaluated in 6 months' beats stale precision.
+
