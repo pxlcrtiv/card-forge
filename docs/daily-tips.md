@@ -118,3 +118,10 @@ A card that states 'expects aligned audio; WER collapses on music' saves integra
 
 A card with numbers from last year is a historical artifact. Date every metric and re-run before major releases; an honest 'not re-evaluated in 6 months' beats stale precision.
 
+
+## 2026-09-13 — Model-card tip of the day: Config diffing catches silent swaps
+
+A shadow-updated config (hidden_size changed, version not bumped) silently breaks downstream assumptions. Diff configs in review before merging model updates.
+
+> `card-forge diff old/config.json new/config.json`
+
