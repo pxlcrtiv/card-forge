@@ -125,3 +125,10 @@ A shadow-updated config (hidden_size changed, version not bumped) silently break
 
 > `card-forge diff old/config.json new/config.json`
 
+
+## 2026-09-14 — Model-card tip of the day: Checklists automate quality
+
+A 0-100 documentation score turns 'please improve the card' into a measurable gate. Enforce a minimum band in CI and watch cards stop rotting.
+
+> `card-forge generate ./config.json --format json`
+
