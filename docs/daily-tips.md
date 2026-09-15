@@ -132,3 +132,8 @@ A 0-100 documentation score turns 'please improve the card' into a measurable ga
 
 > `card-forge generate ./config.json --format json`
 
+
+## 2026-09-15 — Model-card tip of the day: The card is part of the release
+
+Ship config, weights, and card as one artifact. A model without its card in the release notes is half-released; rollback decisions need the card to know what changed.
+
