@@ -137,3 +137,10 @@ A 0-100 documentation score turns 'please improve the card' into a measurable ga
 
 Ship config, weights, and card as one artifact. A model without its card in the release notes is half-released; rollback decisions need the card to know what changed.
 
+
+## 2026-09-16 — Model-card tip of the day: Language fields matter
+
+'en' is a claim about the training distribution. Multi-lingual fine-tunes must say which languages and in what proportion — evaluation leaks otherwise.
+
+> `card-forge generate ./config.json --language en`
+
