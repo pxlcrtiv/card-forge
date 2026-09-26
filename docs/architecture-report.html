@@ -10,7 +10,7 @@
 </head>
 <body class="bg-gray-950 text-gray-200 p-6 max-w-5xl mx-auto">
 <h1 class="text-2xl font-bold text-white mb-1">Architecture Report</h1>
-<p class="text-sm text-gray-500 mb-6">/Users/admin/portfolio/repos/card-forge — scanned 2026-09-26T14:35:58.262373+00:00</p>
+<p class="text-sm text-gray-500 mb-6">/Users/admin/portfolio/repos/card-forge — scanned 2026-09-26T14:37:24.372272+00:00</p>
 
 <div class="grid grid-cols-3 gap-4 mb-8">
   <div class="bg-gray-900 rounded-lg p-4 text-center">
@@ -28,12 +28,47 @@
 </div>
 
 
+    <div class="bg-gray-900 border border-amber-500/30 rounded-lg p-4 mb-6">
+      <div class="text-sm text-amber-400 font-semibold mb-1">Top recommendation</div>
+      <code class="text-white">tests/test_card_forge.py</code>
+      <p class="text-sm text-gray-400 mt-1">High coupling: 9 internal imports</p>
+      <p class="text-xs text-gray-600 mt-2">Run the full <code>improve-codebase-architecture</code> skill on this repo to grill through the deepening.</p>
+    </div>
+
 <h2 class="text-lg font-semibold text-white mt-8 mb-3">High Coupling</h2>
         <div class="bg-gray-900 rounded-lg p-4 mb-3">
           <code class="text-sm text-purple-400">tests/test_card_forge.py</code>
           <p class="text-xs text-gray-500 mt-1">Imports 9 internal modules: card_forge, card_forge, card_forge, card_forge, card_forge</p>
         </div>
 
+
+    <h2 class="text-lg font-semibold text-white mt-8 mb-3">Dependency Graph</h2>
+    <div class="bg-gray-900 rounded-lg p-4 mb-3">
+      <pre class="text-xs text-gray-400 overflow-x-auto">graph TD
+  tests_test_card_forge_py --> __future__
+  tests_test_card_forge_py --> json
+  tests_test_card_forge_py --> card_forge
+  scripts_daily_update_py --> __future__
+  scripts_daily_update_py --> datetime
+  scripts_daily_update_py --> json
+  scripts_daily_update_py --> os
+  scripts_daily_update_py --> re
+  scripts_daily_update_py --> subprocess
+  scripts_daily_update_py --> sys
+  scripts_daily_update_py --> pathlib
+  card_forge_core_py --> __future__
+  card_forge_core_py --> json
+  card_forge_core_py --> dataclasses
+  card_forge_core_py --> pathlib
+  card_forge_cli_py --> __future__
+  card_forge_cli_py --> argparse
+  card_forge_cli_py --> json
+  card_forge_cli_py --> sys
+  card_forge_cli_py --> pathlib
+  card_forge_cli_py --> core
+  card_forge_cli_py --> importlib
+  card_forge_cli_py --> huggingface_hub</pre>
+    </div>
 
 </body>
 </html>
