@@ -217,3 +217,10 @@ The card tells a downstream user what they may assume: license, task, data, limi
 
 > `card-forge generate ./config.json`
 
+
+## 2026-09-29 — Model-card tip of the day: License honesty beats license hope
+
+An undeclared license is a legal wall: nobody can ship your model anywhere. Detect from LICENSE or declare explicitly; 'unspecified' is a red flag, not a neutral state.
+
+> `card-forge generate ./config.json --license MIT`
+
