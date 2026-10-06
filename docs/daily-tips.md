@@ -251,3 +251,10 @@ A card that states 'expects aligned audio; WER collapses on music' saves integra
 
 A card with numbers from last year is a historical artifact. Date every metric and re-run before major releases; an honest 'not re-evaluated in 6 months' beats stale precision.
 
+
+## 2026-10-06 — Model-card tip of the day: Checklists automate quality
+
+A 0-100 documentation score turns 'please improve the card' into a measurable gate. Enforce a minimum band in CI and watch cards stop rotting.
+
+> `card-forge generate ./config.json --format json`
+
