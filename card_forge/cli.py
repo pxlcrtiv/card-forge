@@ -12,12 +12,12 @@ from .core import (
     ARCH_TASKS,
     ConfigDiff,
     ModelFacts,
-    checklist_score,
     detect_license,
     diff_configs,
     estimate_params,
     render_card,
     render_diff,
+    score_checklist,
 )
 
 FIXTURES = Path(__file__).resolve().parent / "data" / "fixtures"
@@ -120,7 +120,8 @@ def main(argv: list[str] | None = None) -> int:
         cfg = load_config(FIXTURES / "bert-tiny-config.json")
         meta = json.loads((FIXTURES / "demo-meta.json").read_text(encoding="utf-8"))
         facts = facts_from(cfg, meta.get("name"), meta.get("license"), meta.get("language"), meta.get("tags"))
-        print(render_card(facts, estimate_params(facts)))
+        params = estimate_params(facts)
+        print(render_card(facts, params, score_checklist(facts, params)))
         return EXIT_OK
 
     if args.command == "generate":
@@ -142,7 +143,7 @@ def main(argv: list[str] | None = None) -> int:
         declared = args.license_ or detect_license(root, None)
         facts = facts_from(cfg, args.name, declared, args.language, args.tag)
         params = estimate_params(facts)
-        band, missing = checklist_score(facts, params)
+        checklist = score_checklist(facts, params)
         if args.format == "json":
             payload = {
                 "name": facts.name,
@@ -153,12 +154,12 @@ def main(argv: list[str] | None = None) -> int:
                 "language": facts.language,
                 "tags": facts.tags,
                 "params_estimated": params,
-                "checklist_band": band,
-                "checklist_missing": missing,
+                "checklist_band": checklist.band,
+                "checklist_missing": checklist.missing,
             }
             print(json.dumps(payload, indent=2, sort_keys=True))
         else:
-            card = render_card(facts, params)
+            card = render_card(facts, params, checklist)
             if args.out:
                 Path(args.out).write_text(card, encoding="utf-8")
                 print(f"wrote {args.out}")
