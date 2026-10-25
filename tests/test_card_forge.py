@@ -7,14 +7,15 @@ import json
 from card_forge.cli import FIXTURES, facts_from, load_config
 from card_forge.core import (
     ARCH_TASKS,
+    Checklist,
     ModelFacts,
-    checklist_score,
     detect_license,
     diff_configs,
     estimate_params,
     normalize_config,
     render_card,
     render_diff,
+    score_checklist,
 )
 
 BERT = load_config(FIXTURES / "bert-tiny-config.json")
@@ -89,29 +90,38 @@ def test_license_unknown_flag():
 
 
 # ---------------------------------------------------------------- checklist + card
-def test_checklist_score_full_meta_is_band_a():
-    band, missing = checklist_score(bert_facts(), estimate_params(bert_facts()))
-    assert band == "A"
-    assert missing == []
+def test_score_checklist_full_meta_is_band_a():
+    checklist = score_checklist(bert_facts(), estimate_params(bert_facts()))
+    assert checklist.band == "A"
+    assert checklist.missing == []
 
 
-def test_checklist_score_bare_config_is_band_d():
+def test_score_checklist_bare_config_is_band_d():
     bare = facts_from(BERT, "x", None, None, None)
-    band, missing = checklist_score(bare, None)
-    assert band == "C"  # arch still yields task inference (15 pts) over a total of 55
-    assert "declared license" in missing and "parameter estimate" in missing
+    checklist = score_checklist(bare, None)
+    assert checklist.band == "C"  # arch still yields task inference (15 pts) over a total of 55
+    assert "declared license" in checklist.missing and "parameter estimate" in checklist.missing
 
 
 def test_card_render_contains_sections():
-    card = render_card(bert_facts(), estimate_params(bert_facts()))
+    checklist = score_checklist(bert_facts(), estimate_params(bert_facts()))
+    card = render_card(bert_facts(), estimate_params(bert_facts()), checklist)
     for needle in ("# demo-bert-tiny", "MIT", "text-classification", "estimated", "Limitations", "Checklist"):
         assert needle in card
 
 
 def test_card_render_deterministic():
-    a = render_card(bert_facts(), estimate_params(bert_facts()))
-    b = render_card(bert_facts(), estimate_params(bert_facts()))
+    checklist = score_checklist(bert_facts(), estimate_params(bert_facts()))
+    a = render_card(bert_facts(), estimate_params(bert_facts()), checklist)
+    b = render_card(bert_facts(), estimate_params(bert_facts()), checklist)
     assert a == b
+
+
+def test_card_render_uses_provided_checklist():
+    checklist = Checklist(band="B", missing=["license"])
+    card = render_card(bert_facts(), estimate_params(bert_facts()), checklist)
+    assert "**Checklist score:** B" in card
+    assert "- [ ] license" in card
 
 
 # ---------------------------------------------------------------- diff
