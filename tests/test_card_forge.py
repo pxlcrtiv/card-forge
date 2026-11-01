@@ -217,3 +217,72 @@ def test_cli_hf_without_dependency(monkeypatch, capsys):
     monkeypatch.setattr(cli, "fetch_hf_config", boom)
     assert cli.main(["generate", "--hf", "some/repo"]) == 2
     assert "optional dependency" in capsys.readouterr().err
+
+
+# ---------------------------------------------------------------- CLI handler unit tests (post-dispatcher)
+def test_cmd_tasks_nonempty(capsys):
+    from card_forge.cli import cmd_tasks
+
+    assert cmd_tasks() == 0
+    assert "text-generation" in capsys.readouterr().out
+
+
+def test_cmd_demo_exit_zero(capsys):
+    from card_forge.cli import cmd_demo
+
+    assert cmd_demo() == 0
+    out = capsys.readouterr().out
+    assert "demo-bert-tiny" in out and "**Checklist score:** A" in out
+
+
+def test_cmd_generate_fixture(capsys):
+    from card_forge.cli import build_parser, cmd_generate
+
+    args = build_parser().parse_args(["generate", str(FIXTURES / "whisper-tiny-config.json")])
+    assert cmd_generate(args) == 0
+    out = capsys.readouterr().out
+    assert "WhisperForConditionalGeneration" in out and "automatic-speech-recognition" in out
+
+
+def test_cmd_generate_json(capsys):
+    from card_forge.cli import build_parser, cmd_generate
+
+    args = build_parser().parse_args([
+        "generate", str(FIXTURES / "bert-tiny-config.json"), "--format", "json"
+    ])
+    assert cmd_generate(args) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["task"] == "text-classification"
+    assert payload["params_estimated"] == 4 * 30522 * 128 + 12 * 128 * 128 * 2
+
+
+def test_cmd_diff_json(capsys):
+    from card_forge.cli import build_parser, cmd_diff
+
+    gpt = str(FIXTURES / "gpt2-tiny-config.json")
+    args = build_parser().parse_args(["diff", str(FIXTURES / "bert-tiny-config.json"), gpt, "--format", "json"])
+    assert cmd_diff(args) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["a"] == "demo-bert-tiny"
+    assert len(payload["changed"]) > 0
+
+
+def test_cmd_generate_missing_file(capsys):
+    from card_forge.cli import build_parser, cmd_generate
+
+    args = build_parser().parse_args(["generate", "/nonexistent/config.json"])
+    assert cmd_generate(args) == 1
+    assert "not found" in capsys.readouterr().err
+
+
+def test_cmd_hf_without_dependency(monkeypatch, capsys):
+    import card_forge.cli as cli_mod
+    from card_forge.cli import build_parser, cmd_generate
+
+    def boom(repo_id):
+        raise RuntimeError("live Hub fetch needs the optional dependency")
+
+    monkeypatch.setattr(cli_mod, "fetch_hf_config", boom)
+    args = build_parser().parse_args(["generate", "--hf", "some/repo"])
+    assert cmd_generate(args) == 2
+    assert "optional dependency" in capsys.readouterr().err

@@ -108,82 +108,102 @@ def _load_for_diff(a: str | None, b: str | None, a_hf: str | None, b_hf: str | N
     return load_config(a), load_config(b)
 
 
+# ---------------------------------------------------------------------------
+# Dispatchers (one per sub-command) — each is independently testable
+# ---------------------------------------------------------------------------
+
+def cmd_tasks() -> int:
+    for arch, (task, metrics, _snippet, _lim) in sorted(ARCH_TASKS.items()):
+        print(f"{arch:<42} {task:<32} {metrics}")
+    return EXIT_OK
+
+
+def cmd_demo() -> int:
+    cfg = load_config(FIXTURES / "bert-tiny-config.json")
+    meta = json.loads((FIXTURES / "demo-meta.json").read_text(encoding="utf-8"))
+    facts = facts_from(cfg, meta.get("name"), meta.get("license"), meta.get("language"), meta.get("tags"))
+    params = estimate_params(facts)
+    print(render_card(facts, params, score_checklist(facts, params)))
+    return EXIT_OK
+
+
+def cmd_generate(args: argparse.Namespace) -> int:
+    try:
+        if args.hf:
+            cfg = fetch_hf_config(args.hf)
+        elif args.target:
+            cfg = load_config(args.target)
+        else:
+            cfg = load_config(FIXTURES / "bert-tiny-config.json")
+    except (FileNotFoundError, ValueError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return EXIT_ERROR
+    except RuntimeError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return EXIT_NO_DEP
+
+    root = Path(args.target).resolve() if args.target and not args.hf else None
+    declared = args.license_ or detect_license(root, None)
+    facts = facts_from(cfg, args.name, declared, args.language, args.tag)
+    params = estimate_params(facts)
+    checklist = score_checklist(facts, params)
+    if args.format == "json":
+        payload = {
+            "name": facts.name,
+            "model_type": facts.model_type,
+            "architectures": facts.architectures,
+            "task": facts.task_info()[0] if facts.task_info() else None,
+            "license": declared,
+            "language": facts.language,
+            "tags": facts.tags,
+            "params_estimated": params,
+            "checklist_band": checklist.band,
+            "checklist_missing": checklist.missing,
+        }
+        print(json.dumps(payload, indent=2, sort_keys=True))
+    else:
+        card = render_card(facts, params, checklist)
+        if args.out:
+            Path(args.out).write_text(card, encoding="utf-8")
+            print(f"wrote {args.out}")
+        else:
+            print(card)
+    return EXIT_OK
+
+
+def cmd_diff(args: argparse.Namespace) -> int:
+    try:
+        ca, cb = _load_for_diff(args.a, args.b, args.a_hf, args.b_hf)
+    except (FileNotFoundError, ValueError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return EXIT_ERROR
+    except RuntimeError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return EXIT_NO_DEP
+    d = diff_configs(ca, cb)
+    if args.format == "json":
+        print(json.dumps(diff_as_dict(d), indent=2, sort_keys=True))
+    else:
+        print(render_diff(d))
+    return EXIT_OK
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
 
-    if args.command == "tasks":
-        for arch, (task, metrics, _snippet, _lim) in sorted(ARCH_TASKS.items()):
-            print(f"{arch:<42} {task:<32} {metrics}")
-        return EXIT_OK
+    dispatch = {
+        "tasks": cmd_tasks,
+        "demo": cmd_demo,
+        "generate": cmd_generate,
+        "diff": cmd_diff,
+    }
+    handler = dispatch.get(args.command)
+    if handler is None:
+        return EXIT_ERROR
 
-    if args.command == "demo":
-        cfg = load_config(FIXTURES / "bert-tiny-config.json")
-        meta = json.loads((FIXTURES / "demo-meta.json").read_text(encoding="utf-8"))
-        facts = facts_from(cfg, meta.get("name"), meta.get("license"), meta.get("language"), meta.get("tags"))
-        params = estimate_params(facts)
-        print(render_card(facts, params, score_checklist(facts, params)))
-        return EXIT_OK
-
-    if args.command == "generate":
-        try:
-            if args.hf:
-                cfg = fetch_hf_config(args.hf)
-            elif args.target:
-                cfg = load_config(args.target)
-            else:
-                cfg = load_config(FIXTURES / "bert-tiny-config.json")
-        except (FileNotFoundError, ValueError) as exc:
-            print(f"error: {exc}", file=sys.stderr)
-            return EXIT_ERROR
-        except RuntimeError as exc:
-            print(f"error: {exc}", file=sys.stderr)
-            return EXIT_NO_DEP
-
-        root = Path(args.target).resolve() if args.target and not args.hf else None
-        declared = args.license_ or detect_license(root, None)
-        facts = facts_from(cfg, args.name, declared, args.language, args.tag)
-        params = estimate_params(facts)
-        checklist = score_checklist(facts, params)
-        if args.format == "json":
-            payload = {
-                "name": facts.name,
-                "model_type": facts.model_type,
-                "architectures": facts.architectures,
-                "task": facts.task_info()[0] if facts.task_info() else None,
-                "license": declared,
-                "language": facts.language,
-                "tags": facts.tags,
-                "params_estimated": params,
-                "checklist_band": checklist.band,
-                "checklist_missing": checklist.missing,
-            }
-            print(json.dumps(payload, indent=2, sort_keys=True))
-        else:
-            card = render_card(facts, params, checklist)
-            if args.out:
-                Path(args.out).write_text(card, encoding="utf-8")
-                print(f"wrote {args.out}")
-            else:
-                print(card)
-        return EXIT_OK
-
-    if args.command == "diff":
-        try:
-            ca, cb = _load_for_diff(args.a, args.b, args.a_hf, args.b_hf)
-        except (FileNotFoundError, ValueError) as exc:
-            print(f"error: {exc}", file=sys.stderr)
-            return EXIT_ERROR
-        except RuntimeError as exc:
-            print(f"error: {exc}", file=sys.stderr)
-            return EXIT_NO_DEP
-        d = diff_configs(ca, cb)
-        if args.format == "json":
-            print(json.dumps(diff_as_dict(d), indent=2, sort_keys=True))
-        else:
-            print(render_diff(d))
-        return EXIT_OK
-
-    return EXIT_ERROR
+    if args.command in ("tasks", "demo"):
+        return handler()
+    return handler(args)
 
 
 def diff_as_dict(d: ConfigDiff) -> dict:
