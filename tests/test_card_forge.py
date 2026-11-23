@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 
-from card_forge.cli import FIXTURES, facts_from, load_config
+from card_forge.cli import FIXTURES, facts_from, load_config, main
 from card_forge.core import (
     ARCH_TASKS,
     Checklist,
@@ -217,3 +217,23 @@ def test_cli_hf_without_dependency(monkeypatch, capsys):
     monkeypatch.setattr(cli, "fetch_hf_config", boom)
     assert cli.main(["generate", "--hf", "some/repo"]) == 2
     assert "optional dependency" in capsys.readouterr().err
+
+
+def test_cli_generate_does_not_report_detected_license_as_declared(tmp_path, capsys):
+    # A LICENSE.md that mentions MIT must NOT be promoted to an author
+    # declaration: the "declared license" dimension of the checklist measures
+    # what the author declared, not whether a LICENSE file is present.
+    (tmp_path / "LICENSE.md").write_text("MIT License\n\nCopyright (c) 2026\n", encoding="utf-8")
+    cfg = {
+        "_model_name": "x",
+        "architectures": ["BertForSequenceClassification"],
+        "model_type": "bert",
+        "hidden_size": 128,
+        "num_hidden_layers": 2,
+        "vocab_size": 30522,
+    }
+    (tmp_path / "config.json").write_text(json.dumps(cfg, indent=2), encoding="utf-8")
+    assert main(["generate", str(tmp_path)]) == 0
+    out = capsys.readouterr().out
+    assert "**License:** unspecified" in out
+    assert "**Checklist score:** B" in out  # 15 pts withheld for the missing declaration

@@ -12,7 +12,6 @@ from .core import (
     ARCH_TASKS,
     ConfigDiff,
     ModelFacts,
-    detect_license,
     diff_configs,
     estimate_params,
     render_card,
@@ -139,8 +138,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"error: {exc}", file=sys.stderr)
             return EXIT_NO_DEP
 
-        root = Path(args.target).resolve() if args.target and not args.hf else None
-        declared = args.license_ or detect_license(root, None)
+        declared = args.license_
         facts = facts_from(cfg, args.name, declared, args.language, args.tag)
         params = estimate_params(facts)
         checklist = score_checklist(facts, params)
