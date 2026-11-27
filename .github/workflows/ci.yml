@@ -26,10 +26,10 @@ jobs:
         run: python -m pytest tests/ -q
       - name: Smoke — bundled fixtures + golden outputs
         run: |
-          card-forge demo | grep -q "Checklist score:** A"
-          card-forge generate card_forge/data/fixtures/whisper-tiny-config.json | grep -q "automatic-speech-recognition"
-          card-forge diff card_forge/data/fixtures/gpt2-tiny-config.json card_forge/data/fixtures/whisper-tiny-config.json | grep -q "13 differences"
-          card-forge tasks | grep -q "text-generation"
+          card-forge demo | grep -Fq "Checklist score:** A"
+          card-forge generate card_forge/data/fixtures/whisper-tiny-config.json | grep -Fq "automatic-speech-recognition"
+          card-forge diff card_forge/data/fixtures/gpt2-tiny-config.json card_forge/data/fixtures/whisper-tiny-config.json | grep -Fq "13 differences"
+          card-forge tasks | grep -Fq "text-generation"
 
   lint:
     runs-on: ubuntu-latest
