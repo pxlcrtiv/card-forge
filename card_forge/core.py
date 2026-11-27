@@ -107,6 +107,24 @@ class ModelFacts:
         return None
 
 
+def facts_from(
+    config: dict,
+    name: str | None,
+    license_: str | None,
+    language: str | None,
+    tags: list[str] | None,
+) -> ModelFacts:
+    """Build facts from a config dict and author metadata (one owner)."""
+    cfg_name = str(config.get("_model_name", "unnamed-model"))
+    return ModelFacts(
+        name=name or cfg_name,
+        config=config,
+        license=license_,
+        language=language,
+        tags=tags or [],
+    )
+
+
 @dataclass
 class Checklist:
     band: str
@@ -146,7 +164,9 @@ def estimate_params(facts: ModelFacts) -> int | None:
     if "whisper" in model_type:
         enc = _h(c, "encoder_layers", "num_hidden_layers") or layers
         dec = _h(c, "decoder_layers") or enc
-        mel = _h(c, "num_mel_bins", 80)
+        mel = _h(c, "num_mel_bins")
+        if mel is None:
+            mel = 80  # Whisper's standard mel-bin count when the config omits it
         head = mel * hidden
         base = 12 * hidden * hidden * (enc + dec) + (vocab or 51865) * hidden + head
     elif "clip" in model_type:
