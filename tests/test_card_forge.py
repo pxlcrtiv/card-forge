@@ -17,6 +17,7 @@ from card_forge.core import (
     render_diff,
     score_checklist,
 )
+from card_forge.generate import generate_card
 
 BERT = load_config(FIXTURES / "bert-tiny-config.json")
 GPT2 = load_config(FIXTURES / "gpt2-tiny-config.json")
@@ -64,6 +65,14 @@ def test_params_whisper_tiny_golden():
     assert estimate_params(facts_from(WHISPER, None, None, None, None)) == (
         12 * 384 * 384 * 8 + 51865 * 384 + 80 * 384
     )
+
+
+def test_params_whisper_without_num_mel_bins_uses_default():
+    # A Whisper config need not spell out num_mel_bins; the 80-bin default
+    # must be a real fallback, not a key handed to _h as a lookup key.
+    cfg = {k: v for k, v in WHISPER.items() if k != "num_mel_bins"}
+    facts = facts_from(cfg, None, None, None, None)
+    assert estimate_params(facts) == 12 * 384 * 384 * 8 + 51865 * 384 + 80 * 384
 
 
 def test_params_clip_tiny_golden():
@@ -122,6 +131,46 @@ def test_card_render_uses_provided_checklist():
     card = render_card(bert_facts(), estimate_params(bert_facts()), checklist)
     assert "**Checklist score:** B" in card
     assert "- [ ] license" in card
+
+
+# ---------------------------------------------------------------- generation seam
+def test_generate_card_returns_finished_result():
+    result = generate_card(
+        BERT,
+        name="my-model",
+        license_="MIT",
+        language="en",
+        tags=["transformers", "bert"],
+    )
+    assert result.name == "my-model"
+    assert result.model_type == "bert"
+    assert result.task == "text-classification"
+    assert result.params_estimated == 4 * 30522 * 128 + 12 * 128 * 128 * 2
+    assert result.checklist_band == "A"
+    assert result.checklist_missing == []
+    assert "# my-model" in result.markdown
+    assert "**License:** MIT" in result.markdown
+    assert result.as_dict() == {
+        "name": "my-model",
+        "model_type": "bert",
+        "architectures": ["BertForSequenceClassification"],
+        "task": "text-classification",
+        "license": "MIT",
+        "language": "en",
+        "tags": ["transformers", "bert"],
+        "params_estimated": 4 * 30522 * 128 + 12 * 128 * 128 * 2,
+        "checklist_band": "A",
+        "checklist_missing": [],
+    }
+
+
+def test_cli_generate_whisper_config_without_mel_bins(tmp_path, capsys):
+    cfg = {k: v for k, v in WHISPER.items() if k != "num_mel_bins"}
+    (tmp_path / "config.json").write_text(json.dumps(cfg), encoding="utf-8")
+    assert main(["generate", str(tmp_path)]) == 0
+    out = capsys.readouterr().out
+    assert "**Parameters:** 34,102,656 (estimated)" in out
+    assert "automatic-speech-recognition" in out
 
 
 # ---------------------------------------------------------------- diff

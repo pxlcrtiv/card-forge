@@ -7,17 +7,14 @@ import json
 import sys
 from pathlib import Path
 
-from . import __version__
+from . import __version__, core
 from .core import (
     ARCH_TASKS,
     ConfigDiff,
-    ModelFacts,
     diff_configs,
-    estimate_params,
-    render_card,
     render_diff,
-    score_checklist,
 )
+from .generate import generate_card
 
 FIXTURES = Path(__file__).resolve().parent / "data" / "fixtures"
 EXIT_OK, EXIT_NO_DEP, EXIT_ERROR = 0, 2, 1
@@ -56,15 +53,9 @@ def fetch_hf_config(repo_id: str) -> dict:
         raise RuntimeError(f"failed to fetch {repo_id!r} from the Hub: {exc}") from exc
 
 
-def facts_from(config: dict, name: str | None, license_: str | None, language: str | None, tags: list[str] | None) -> ModelFacts:
-    cfg_name = str(config.get("_model_name", "unnamed-model"))
-    return ModelFacts(
-        name=name or cfg_name,
-        config=config,
-        license=license_,
-        language=language,
-        tags=tags or [],
-    )
+def facts_from(config: dict, name: str | None, license_: str | None, language: str | None, tags: list[str] | None) -> core.ModelFacts:
+    """Backwards-compatible public adapter to core.facts_from."""
+    return core.facts_from(config, name, license_, language, tags)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -118,9 +109,14 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "demo":
         cfg = load_config(FIXTURES / "bert-tiny-config.json")
         meta = json.loads((FIXTURES / "demo-meta.json").read_text(encoding="utf-8"))
-        facts = facts_from(cfg, meta.get("name"), meta.get("license"), meta.get("language"), meta.get("tags"))
-        params = estimate_params(facts)
-        print(render_card(facts, params, score_checklist(facts, params)))
+        result = generate_card(
+            cfg,
+            name=meta.get("name"),
+            license_=meta.get("license"),
+            language=meta.get("language"),
+            tags=meta.get("tags"),
+        )
+        print(result.markdown)
         return EXIT_OK
 
     if args.command == "generate":
@@ -139,30 +135,21 @@ def main(argv: list[str] | None = None) -> int:
             return EXIT_NO_DEP
 
         declared = args.license_
-        facts = facts_from(cfg, args.name, declared, args.language, args.tag)
-        params = estimate_params(facts)
-        checklist = score_checklist(facts, params)
+        result = generate_card(
+            cfg,
+            name=args.name,
+            license_=declared,
+            language=args.language,
+            tags=args.tag,
+        )
         if args.format == "json":
-            payload = {
-                "name": facts.name,
-                "model_type": facts.model_type,
-                "architectures": facts.architectures,
-                "task": facts.task_info()[0] if facts.task_info() else None,
-                "license": declared,
-                "language": facts.language,
-                "tags": facts.tags,
-                "params_estimated": params,
-                "checklist_band": checklist.band,
-                "checklist_missing": checklist.missing,
-            }
-            print(json.dumps(payload, indent=2, sort_keys=True))
+            print(json.dumps(result.as_dict(), indent=2, sort_keys=True))
         else:
-            card = render_card(facts, params, checklist)
             if args.out:
-                Path(args.out).write_text(card, encoding="utf-8")
+                Path(args.out).write_text(result.markdown, encoding="utf-8")
                 print(f"wrote {args.out}")
             else:
-                print(card)
+                print(result.markdown)
         return EXIT_OK
 
     if args.command == "diff":
